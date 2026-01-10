@@ -1,0 +1,18 @@
+HR test role logins 
+{
+  "empNumber": "HR001",
+  "password": "hr123"
+}
+
+
+Manager 
+{
+  "empNumber": "M001",
+  "password": "manager123"
+}
+
+Employee 
+{
+  "empNumber": "E001",
+  "password": "employee123"
+}
