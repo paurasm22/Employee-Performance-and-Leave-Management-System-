@@ -5,11 +5,20 @@ HR test role logins
 }
 
 
-Manager 
+Manager 1
 {
   "empNumber": "M001",
   "password": "manager123"
 }
+
+Manager 2 
+M002
+manager2
+
+
+
+
+
 
 Employee 
 {

@@ -20,6 +20,8 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("userId", data.userId);
+      localStorage.setItem("name", data.name);
+      localStorage.setItem("empNumber", data.empNumber);
 
       setRole(data.role); // 🔥 THIS FIXES THE REFRESH ISSUE
 

@@ -22,7 +22,8 @@ export async function POST(req) {
   return Response.json({
     token,
     role: user.role,
-    name: user.name,
     userId: user._id,
+    name: user.name,
+    empNumber: user.empNumber,
   });
 }
