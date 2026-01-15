@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import PerformanceReview from "@/models/PerformanceReview";
-import Task from "@/models/Task";
+import Task from "@/models/Tasks";
 
 export async function POST(req) {
   try {

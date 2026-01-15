@@ -1,7 +1,7 @@
 import { connectDB } from "../../../../lib/db";
 import PerformanceReview from "../../../../models/PerformanceReview";
 import "../../../../models/User";
-import "../../../../models/Task";
+import "../../../../models/Tasks";
 import "../../../../models/Project";
 
 export async function GET(req) {

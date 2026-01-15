@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/db";
 import Leave from "@/models/Leave";
 import Project from "@/models/Project";
 import "@/models/User";
-import { getMonthRange, statusToColor } from "@/lib/calendar";
+import { getMonthRange, statusToColor } from "../../../lib/calender";
 
 export async function GET(req) {
   await connectDB();

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import PerformanceReview from "@/models/PerformanceReview";
-
+import PerformanceReview from "../../../../models/PerformanceReview";
+import "@/models/Tasks"; // ✅ THIS WAS MISSING
+import "@/models/Project";
 export async function GET() {
   try {
     await connectDB();
