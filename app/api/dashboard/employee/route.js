@@ -1,39 +1,39 @@
-import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import Task from "@/models/Tasks";
 import Project from "@/models/Project";
+import Task from "@/models/Tasks";
 import Leave from "@/models/Leave";
 
 export async function GET(req) {
-  try {
-    await connectDB();
+  await connectDB();
 
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId");
 
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
-    }
+  const projects = await Project.countDocuments({
+    employees: userId,
+  });
 
-    const tasks = await Task.find({ assignedTo: userId });
-    const projects = await Project.find({ employees: userId });
-    const pendingLeaves = await Leave.countDocuments({
-      employee: userId,
-      status: "pending",
-    });
+  const tasks = await Task.countDocuments({
+    assignedTo: userId,
+  });
 
-    const upcomingTasks = tasks
-      .filter((t) => new Date(t.deadline) >= new Date())
-      .slice(0, 5);
+  const pendingLeaves = await Leave.countDocuments({
+    employee: userId,
+    status: "pending",
+  });
 
-    return NextResponse.json({
-      projects: projects.length,
-      tasks: tasks.length,
-      pendingLeaves,
-      upcomingTasks,
-    });
-  } catch (error) {
-    console.error("Employee Dashboard Error:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  const upcomingTasks = await Task.find({
+    assignedTo: userId,
+    deadline: { $gte: new Date() },
+  })
+    .sort({ deadline: 1 })
+    .limit(5)
+    .select("title deadline");
+
+  return Response.json({
+    projects,
+    tasks,
+    pendingLeaves,
+    upcomingTasks,
+  });
 }

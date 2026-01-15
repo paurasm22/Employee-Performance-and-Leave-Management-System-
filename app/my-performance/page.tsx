@@ -154,7 +154,7 @@ export default function MyPerformanceCombinedPage() {
   return (
     <div className="p-6">
       {/* HEADER */}
-      <div className="flex justify-between mb-4">
+      {/* <div className="flex justify-between mb-4">
         <h1 className="text-2xl font-bold">My Performance Dashboard</h1>
 
         <button
@@ -163,7 +163,7 @@ export default function MyPerformanceCombinedPage() {
         >
           Download PDF
         </button>
-      </div>
+      </div> */}
 
       {/* FILTERS */}
       <div className="flex gap-3 mb-6">

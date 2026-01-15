@@ -1,16 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import CreateProject from "./CreateProject";
 import ProjectList from "./ProjectList";
 
 export default function ProjectsPage() {
-  const role =
-    typeof window !== "undefined"
-      ? localStorage.getItem("role")
-      : null;
-
+  const [role, setRole] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "create">("list");
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+     setMounted(true);
+     setRole(localStorage.getItem("role"));
+  }, []);
+
+  if (!mounted) return null; 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">

@@ -2,7 +2,7 @@ import { connectDB } from "@/lib/db";
 import Leave from "@/models/Leave";
 import Project from "@/models/Project";
 import "@/models/User";
-import { getMonthRange, statusToColor } from "@/lib/calendar";
+import { getMonthRange, statusToColor } from "@/lib/calender";
 
 export async function GET(req) {
   await connectDB();
@@ -16,6 +16,7 @@ export async function GET(req) {
 
   const { start, end } = getMonthRange(month);
 
+  /* 1️⃣ Fetch leaves */
   const leaves = await Leave.find({
     $or: [
       { fromDate: { $lte: end, $gte: start } },
@@ -23,29 +24,45 @@ export async function GET(req) {
     ],
   }).populate("employee", "name empNumber department");
 
+  /* 2️⃣ Fetch projects with employees + managers */
   const projects = await Project.find()
     .populate("employees", "_id")
-    .select("name employees");
+    .populate("managers", "name empNumber")
+    .select("name employees managers");
 
+  /* 3️⃣ Build Employee → Projects map */
   const employeeProjectMap = {};
+  const employeeManagerMap = {};
 
   projects.forEach((p) => {
     p.employees.forEach((e) => {
-      if (!employeeProjectMap[e._id]) {
-        employeeProjectMap[e._id] = [];
+      const empId = e._id.toString();
+
+      if (!employeeProjectMap[empId]) {
+        employeeProjectMap[empId] = [];
       }
-      employeeProjectMap[e._id].push(p.name);
+
+      employeeProjectMap[empId].push(p.name);
+
+      // assign first manager of the project
+      if (!employeeManagerMap[empId]) {
+        employeeManagerMap[empId] = p.managers?.[0] || null;
+      }
     });
   });
 
+  /* 4️⃣ Build calendar events */
   const events = leaves.map((l) => {
-    const projects = employeeProjectMap[l.employee._id] || [];
+    const empId = l.employee._id.toString();
+    const projects = employeeProjectMap[empId] || [];
+    const manager = employeeManagerMap[empId];
 
     return {
       id: l._id,
       employeeName: l.employee.name,
       employeeId: l.employee.empNumber,
       department: l.employee.department,
+      managerName: manager?.name || "-",
       projectLabel:
         projects.length === 1 ? projects[0] : `${projects.length} Projects`,
       projects,

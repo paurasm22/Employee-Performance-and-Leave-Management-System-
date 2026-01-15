@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "app/projects/delete/route.js", "app/projects/remove-employee/route.js", "app/projects/remove-manager/route.js"  ],
   "exclude": ["node_modules"]
 }

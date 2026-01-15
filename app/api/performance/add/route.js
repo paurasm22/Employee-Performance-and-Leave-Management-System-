@@ -38,9 +38,10 @@ export async function POST(req) {
     employee: employeeId,
     task: taskId,
     project: projectId,
+    manager: reviewedBy, // 🔥 REQUIRED
+    reviewedBy: reviewedBy,
     rating,
     comment,
-    reviewedBy,
   });
 
   return Response.json({
