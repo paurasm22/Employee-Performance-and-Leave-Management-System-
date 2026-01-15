@@ -31,11 +31,46 @@ const PerformanceReviewSchema = new mongoose.Schema(
       required: true,
     },
 
+    manager: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     reviewedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // manager
       required: true,
     },
+
+    // 🔥 NEW FIELDS (Safe Additions)
+
+    status: {
+      type: String,
+      enum: ["submitted", "edited", "overridden"],
+      default: "submitted",
+    },
+
+    // HR override system
+    hrOverride: {
+      isOverridden: {
+        type: Boolean,
+        default: false,
+      },
+      hr: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      newRating: {
+        type: String,
+        enum: ["Excellent", "Good", "Satisfactory", "Needs Improvement"],
+      },
+      hrComment: String,
+      overriddenAt: Date,
+    },
+
+    // Manager edit tracking
+    lastEditedAt: Date,
   },
   { timestamps: true }
 );

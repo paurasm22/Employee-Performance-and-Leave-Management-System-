@@ -27,7 +27,6 @@ interface Review {
   rating: Rating;
   createdAt: string;
   project: { name: string };
-  employee?: { name: string };
 }
 
 /* ================= UTILS ================= */
@@ -39,95 +38,31 @@ const ratingScore: Record<Rating, number> = {
   "Needs Improvement": 1,
 };
 
-const COLORS = ["#4ade80", "#60a5fa", "#facc15", "#f87171"];
+const COLORS: string[] = ["#4ade80", "#60a5fa", "#facc15", "#f87171"];
 
 /* ================= PAGE ================= */
 
-export default function PerformanceAnalyticsPage() {
-  const role =
-    typeof window !== "undefined" ? localStorage.getItem("role") : null;
-  const userId =
-    typeof window !== "undefined" ? localStorage.getItem("userId") : null;
-
-  if (!role || !userId) return <p className="p-6">Loading...</p>;
-
-  if (role === "employee") return <EmployeeAnalytics userId={userId} />;
-  if (role === "manager") return <ManagerAnalytics userId={userId} />;
-  if (role === "hr") return <HRAnalytics />;
-
-  return null;
-}
-
-/* ================================================= */
-/* ================= EMPLOYEE ====================== */
-/* ================================================= */
-
-function EmployeeAnalytics({ userId }: { userId: string }) {
-  return (
-    <AnalyticsBase
-      title="My Performance Analytics"
-      endpoint={`/api/performance/by-employee?employeeId=${userId}`}
-      showEmployee={false}
-    />
-  );
-}
-
-/* ================================================= */
-/* ================= MANAGER ======================= */
-/* ================================================= */
-
-function ManagerAnalytics({ userId }: { userId: string }) {
-  return (
-    <AnalyticsBase
-      title="Team Performance Analytics"
-      endpoint={`/api/performance/by-manager?managerId=${userId}`}
-      showEmployee={true}
-    />
-  );
-}
-
-/* ================================================= */
-/* ================= HR ============================ */
-/* ================================================= */
-
-function HRAnalytics() {
-  return (
-    <AnalyticsBase
-      title="Organization Performance Analytics"
-      endpoint={`/api/performance/all`}
-      showEmployee={true}
-    />
-  );
-}
-
-/* ================================================= */
-/* ================= BASE ========================== */
-/* ================================================= */
-
-function AnalyticsBase({
-  title,
-  endpoint,
-  showEmployee,
-}: {
-  title: string;
-  endpoint: string;
-  showEmployee: boolean;
-}) {
+export default function EmployeeAnalyticsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
   const dashboardRef = useRef<HTMLDivElement>(null);
 
+  const userId =
+    typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+
   useEffect(() => {
-    fetch(endpoint)
+    if (!userId) return;
+
+    fetch(`/api/performance/by-employee?employeeId=${userId}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setReviews(data);
         else if (Array.isArray(data.data)) setReviews(data.data);
         else setReviews([]);
       });
-  }, [endpoint]);
+  }, [userId]);
 
   /* ================= FILTER ================= */
 
@@ -204,7 +139,7 @@ function AnalyticsBase({
     const height = (canvas.height * width) / canvas.width;
 
     pdf.addImage(img, "PNG", 0, 0, width, height);
-    pdf.save("performance-report.pdf");
+    pdf.save("my-performance-report.pdf");
   };
 
   /* ================= UI ================= */
@@ -212,7 +147,7 @@ function AnalyticsBase({
   return (
     <div className="p-6">
       <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">{title}</h1>
+        <h1 className="text-2xl font-bold">My Performance Analytics</h1>
 
         <button
           onClick={downloadPDF}
@@ -249,6 +184,7 @@ function AnalyticsBase({
 
         {/* CHARTS */}
         <div className="grid md:grid-cols-2 gap-6">
+          {/* Trend */}
           <div className="bg-white p-4 rounded shadow">
             <h2 className="font-semibold mb-2">Monthly Trend</h2>
             <ResponsiveContainer width="100%" height={250}>
@@ -267,6 +203,7 @@ function AnalyticsBase({
             </ResponsiveContainer>
           </div>
 
+          {/* Pie */}
           <div className="bg-white p-4 rounded shadow">
             <h2 className="font-semibold mb-2">Rating Distribution</h2>
             <ResponsiveContainer width="100%" height={250}>
@@ -281,6 +218,7 @@ function AnalyticsBase({
             </ResponsiveContainer>
           </div>
 
+          {/* Project */}
           <div className="bg-white p-4 rounded shadow md:col-span-2">
             <h2 className="font-semibold mb-2">Project-wise Performance</h2>
             <ResponsiveContainer width="100%" height={300}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export default function LandingPage() {
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-indigo-700 flex flex-col items-center justify-center text-white px-6">
       
