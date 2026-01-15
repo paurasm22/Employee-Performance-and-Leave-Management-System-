@@ -1,8 +1,8 @@
-import { connectDB } from "../../../../lib/db";
-import PerformanceReview from "../../../../models/PerformanceReview";
-import "../../../../models/User";
-import "../../../../models/Tasks";
+import { connectDB } from "@/lib/db";
+import PerformanceReview from "@/models/PerformanceReview";
+import mongoose from "mongoose";
 import "../../../../models/Project";
+import "../../../../models/Tasks";
 
 export async function GET(req) {
   await connectDB();
@@ -11,15 +11,17 @@ export async function GET(req) {
   const employeeId = searchParams.get("employeeId");
 
   if (!employeeId) {
-    return Response.json({ error: "Employee ID required" }, { status: 400 });
+    return Response.json([], { status: 200 });
   }
 
+  const objectId = new mongoose.Types.ObjectId(employeeId);
+
   const reviews = await PerformanceReview.find({
-    employee: employeeId,
+    employee: objectId,
   })
-    .populate("task", "title")
     .populate("project", "name")
-    .populate("reviewedBy", "name empNumber")
+    .populate("task", "title")
+    .populate("reviewedBy", "name")
     .sort({ createdAt: -1 });
 
   return Response.json(reviews);

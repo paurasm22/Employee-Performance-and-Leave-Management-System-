@@ -1,7 +1,7 @@
+import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import Tasks from "@/models/Tasks";
-import Projects from "@/models/Project";
-import "@/models/User";
+import Project from "@/models/Project";
+import Task from "@/models/Tasks";
 
 export async function GET(req) {
   await connectDB();
@@ -9,20 +9,17 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const managerId = searchParams.get("managerId");
 
-  if (!managerId) {
-    return Response.json({ error: "Manager ID required" }, { status: 400 });
-  }
+  if (!managerId) return NextResponse.json([]);
 
-  // Find projects owned by this manager
-  const projects = await Projects.find({ manager: managerId }).select("_id");
-
+  const projects = await Project.find({ managers: managerId }).select("_id");
   const projectIds = projects.map((p) => p._id);
 
-  // Find tasks under those projects
-  const tasks = await Tasks.find({ project: { $in: projectIds } })
+  const tasks = await Task.find({
+    project: { $in: projectIds },
+  })
     .populate("assignedTo", "name empNumber")
     .populate("project", "name")
-    .sort({ deadline: 1 });
+    .select("title status deadline assignedTo project");
 
-  return Response.json(tasks);
+  return NextResponse.json(tasks);
 }

@@ -79,7 +79,8 @@ export default function Dashboard() {
     let url = "";
 
     if (role === "employee")
-      url = `/api/leaves/by-employee?employeeId=${userId}`;
+  url = `/api/dashboard/employee?userId=${userId}`;
+
     if (role === "manager")
       url = `/api/dashboard/manager?userId=${userId}`;
     if (role === "hr")

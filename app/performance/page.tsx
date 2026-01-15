@@ -198,16 +198,26 @@ function Analytics({
     score: monthMap[m],
   }));
 
-  const downloadPDF = async () => {
-    if (!dashboardRef.current) return;
-    const canvas = await html2canvas(dashboardRef.current);
-    const img = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const width = 210;
-    const height = (canvas.height * width) / canvas.width;
-    pdf.addImage(img, "PNG", 0, 0, width, height);
-    pdf.save("performance-report.pdf");
-  };
+const downloadPDF = async () => {
+  const pdfDom = document.getElementById("pdf-clone");
+  if (!pdfDom) return;
+
+  const canvas = await html2canvas(pdfDom, {
+    backgroundColor: "#ffffff",
+    scale: 2,
+    useCORS: true,
+    foreignObjectRendering: true,   // 🔥 THIS IS THE FIX
+  });
+
+  const img = canvas.toDataURL("image/png");
+
+  const pdf = new jsPDF("p", "mm", "a4");
+  const width = 210;
+  const height = (canvas.height * width) / canvas.width;
+
+  pdf.addImage(img, "PNG", 0, 0, width, height);
+  pdf.save("performance-report.pdf");
+};
 
   return (
     <div>
@@ -217,7 +227,7 @@ function Analytics({
           onClick={downloadPDF}
           className=" text-white px-4 py-2 rounded"
         >
-          
+         
         </button>
       </div>
 
@@ -236,7 +246,7 @@ function Analytics({
         />
       </div>
 
-      <div ref={dashboardRef}>
+      <div ref={dashboardRef} id="pdf-area">
         <div className="grid grid-cols-4 gap-4 mb-6">
           <Card title="Total Reviews" value={total} />
           <Card title="Average Score" value={avg} />
@@ -282,7 +292,40 @@ function Analytics({
           </ChartCard>
         </div>
       </div>
-    </div>
+
+       <div
+    id="pdf-clone"
+    style={{
+      position: "fixed",
+      left: "-9999px",
+      top: 0,
+      width: "1000px",
+      background: "#fff",
+      padding: "20px",
+      fontFamily: "Arial",
+    }}
+  >
+    <h2>{title}</h2>
+    <p>Total Reviews: {total}</p>
+    <p>Average Score: {avg}</p>
+    <p>Best Score: {best}</p>
+    <p>Worst Score: {worst}</p>
+
+    <h3>Project Performance</h3>
+    {projectData.map((p) => (
+      <p key={p.name}>
+        {p.name}: {p.score}
+      </p>
+    ))}
+
+    <h3>Monthly Trend</h3>
+    {trendData.map((m) => (
+      <p key={m.month}>
+        {m.month}: {m.score}
+      </p>
+    ))}
+  </div>
+</div>
   );
 }
 

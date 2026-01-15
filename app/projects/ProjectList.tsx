@@ -22,11 +22,14 @@ export default function ProjectList() {
       ? localStorage.getItem("role")
       : null;
 
-  useEffect(() => {
-    fetch("/api/projects/list")
-      .then((res) => res.json())
-      .then(setProjects);
-  }, []);
+useEffect(() => {
+  const userId = localStorage.getItem("userId");
+  const role = localStorage.getItem("role");
+
+  fetch(`/api/projects/list?userId=${userId}&role=${role}`)
+    .then(res => res.json())
+    .then(setProjects);
+}, []);
 
   const getDuration = (start: string, end: string) => {
     return Math.ceil(
