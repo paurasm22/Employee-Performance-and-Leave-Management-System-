@@ -7,6 +7,9 @@ export default function ApplyLeavePage() {
   const [leaveType, setLeaveType] = useState("casual");
   const [reason, setReason] = useState("");
 
+  // 👉 Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0];
+
   const employeeId =
     typeof window !== "undefined"
       ? localStorage.getItem("userId")
@@ -15,6 +18,16 @@ export default function ApplyLeavePage() {
   const submitLeave = async () => {
     if (!fromDate || !toDate) {
       alert("Please select dates");
+      return;
+    }
+
+    if (fromDate < today) {
+      alert("You cannot apply leave for past dates");
+      return;
+    }
+
+    if (toDate < fromDate) {
+      alert("To Date cannot be before From Date");
       return;
     }
 
@@ -50,7 +63,11 @@ export default function ApplyLeavePage() {
           type="date"
           className="border p-2 w-full mb-3"
           value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
+          min={today} // ✅ restrict past dates
+          onChange={(e) => {
+            setFromDate(e.target.value);
+            setToDate(""); // reset To Date if From Date changes
+          }}
         />
 
         <label className="block mb-1">To Date</label>
@@ -58,6 +75,7 @@ export default function ApplyLeavePage() {
           type="date"
           className="border p-2 w-full mb-3"
           value={toDate}
+          min={fromDate || today} // ✅ cannot be before From Date
           onChange={(e) => setToDate(e.target.value)}
         />
 
